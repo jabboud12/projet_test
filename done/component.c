@@ -7,7 +7,7 @@
 
 int component_create(component_t* c, size_t mem_size) 
 {
-    if (c == NULL || mem_size < 0 || mem_size >= MAX_MEM_SIZE) 
+    if (c == NULL || mem_size < 0 || mem_size > MAX_MEM_SIZE) 
     {
         return ERR_BAD_PARAMETER;
     }
