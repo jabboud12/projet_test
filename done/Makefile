@@ -27,15 +27,17 @@ all::
 
 unit-test-alu: unit-test-alu.o alu.o bit.o tests.h
 unit-test-bit: unit-test-bit.o alu.o bit.o tests.h
+unit-test-bus: unit-test-bus.o 
 
 alu.o: alu.c alu.h bit.h error.h
 bit.o: bit.c bit.h
 error.o: error.c error.h
 util.o: util.c
+# bus.o: bus.c bus.h component.h memory.h
 
 unit-test-alu.o: unit-test-alu.c tests.h error.h alu.h bit.h
 unit-test-bit.o: unit-test-bit.c tests.h error.h bit.h
-#unit-test-bus.o: unit-test-bus.c tests.h error.h bus.h memory.h component.h util.h
+unit-test-bus.o: unit-test-bus.c tests.h error.h bus.h memory.h component.h util.h
 #unit-test-component.o: unit-test-component.c tests.h error.h bus.h memory.h component.h
 #unit-test-memory.o: unit-test-memory.c tests.h error.h bus.h memory.h component.h
 

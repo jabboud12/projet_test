@@ -12,7 +12,7 @@ int component_create(component_t* c, size_t mem_size)
         return ERR_BAD_PARAMETER;
     }
 
-    c->memory.size = mem_size;
+    c->mem.size = mem_size;
     component_free(c);
     return ERR_NONE;
 }
