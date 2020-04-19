@@ -13,6 +13,7 @@
 
 #include "memory.h"     // addr_t and data_t
 #include "component.h"
+#include "bit.h"        // merge8() lsb8() msb8()
 
 #ifdef __cplusplus
 extern "C" {

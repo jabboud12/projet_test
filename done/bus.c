@@ -41,7 +41,7 @@ int bus_remap(bus_t bus, component_t *c, addr_t offset)
 
     for (int i = 0; i <= end - start; i++)
     {
-        bus[start + i] = &(mem.memory[offset + i]);
+        bus[start + i] = &(mem.memory[offset +512+ i]); //FIXME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
 
     return ERR_NONE;
@@ -64,7 +64,7 @@ int bus_forced_plug(bus_t bus, component_t *c, addr_t start, addr_t end, addr_t 
         c->end = 0;
         return err;
     }
-
+   
     return ERR_NONE;
 }
 
@@ -116,16 +116,21 @@ int bus_read(const bus_t bus, addr_t address, data_t *data)
 
     if (data == NULL)
     {
-        return ERR_BAD_PARAMETER;
+       return ERR_BAD_PARAMETER;
     }
 
-    data_t dat = 0xff;
+    data_t dat = 0x3;
     data = &dat;
+
+        printf("pre data = %u\n", *data);
 
     if (bus[address] != NULL)
     {
-        data = bus[address];
+        data = (data_t*)bus[address];
     }
+
+        printf("post data = %u\n", *data);
+
 
     return ERR_NONE;
 }
