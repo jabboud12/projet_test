@@ -26,11 +26,11 @@ int bus_remap(bus_t bus, component_t *c, addr_t offset)
 {
     addr_t start = c->start;
     addr_t end = c->end;
-    memory_t mem = c->mem;
+    memory_t* mem = c->mem;
 
     // Check if the span of the zone is larger than the component's memory,
     // Or if the component's start address is bigger than its end
-    if (end - start + offset >= mem.size)
+    if (end - start + offset >= mem->size)
     {
         return ERR_ADDRESS;
     }
@@ -41,7 +41,7 @@ int bus_remap(bus_t bus, component_t *c, addr_t offset)
 
     for (int i = 0; i <= end - start; ++i)//should it be addr_t i 
     {
-        bus[start + i] = &(c->mem.memory[offset + i]);
+        bus[start + i] = &(c->mem->memory[offset + i]);
     }
 
     return ERR_NONE;

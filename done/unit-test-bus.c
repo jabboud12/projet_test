@@ -76,10 +76,10 @@ START_TEST(bus_plug_exec)
     for (size_t i = 0; i < c_size; ++i) {
         // fprintf(stderr, "Running bus plug for bus[i] = c.mem.memory + i  for i = %u\n", i);
         // fprintf(stderr, "bus[i] = %zx \t ||| \t c.mem.memory = %zx\n", bus[i], c.mem.memory);
-        ck_assert(bus[i] == c.mem.memory + i);
+        ck_assert(bus[i] == c.mem->memory + i);
         ck_assert(*bus[i] == 0);
         *bus[i] = data;
-        ck_assert(c.mem.memory[i] == data);
+        ck_assert(c.mem->memory[i] == data);
     }
 
     ck_assert_int_eq(bus_unplug(bus, &c), ERR_NONE);
