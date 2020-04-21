@@ -74,8 +74,8 @@ START_TEST(bus_plug_exec)
     ck_assert(c.end == c_size);
 
     for (size_t i = 0; i < c_size; ++i) {
-        //fprintf(stderr, "Running bus plug for bus[i] = c.mem.memory + i  for i = %u\n", i);
-        //fprintf(stderr, "bus[i] = %u \t ||| \t c.mem.memory = %u\n", bus[i], c.mem.memory);
+        // fprintf(stderr, "Running bus plug for bus[i] = c.mem.memory + i  for i = %u\n", i);
+        // fprintf(stderr, "bus[i] = %zx \t ||| \t c.mem.memory = %zx\n", bus[i], c.mem.memory);
         ck_assert(bus[i] == c.mem.memory + i);
         ck_assert(*bus[i] == 0);
         *bus[i] = data;
@@ -145,7 +145,7 @@ START_TEST(bus_read_exec)
 
     for (size_t addr = 0; addr < c_size; ++addr) {
         ck_assert_int_eq(bus_read(bus, (addr_t) addr, &data), ERR_NONE);
-//        fprintf(stderr, " data = %u \t|||\t (data_t)addr = %u\n", data, (data_t)addr);
+       fprintf(stderr, " data = %u \t|||\t (data_t)addr = %u\n", data, (data_t)addr);
         ck_assert(data == (data_t)addr);
     }
 
