@@ -174,18 +174,19 @@ int bus_write(bus_t bus, addr_t address, data_t data)
 {
     
 
-    if (address <= 0 || address > BUS_SIZE)
+    if (address < 0 || address > BUS_SIZE || bus[address] == NULL )
     {
         return ERR_BAD_PARAMETER;
     }
 
-    bus[address] = &data;
+    //bus[address] = &data;
+    *bus[address] = data;
     return ERR_NONE;
 }
 
 int bus_write16(bus_t bus, addr_t address, addr_t data16)
 {
-    if (address <= 0 || address > BUS_SIZE)
+    if (address <= 0 || address > BUS_SIZE || bus[address] = NULL)
     {
         return ERR_BAD_PARAMETER;
     }
@@ -193,8 +194,8 @@ int bus_write16(bus_t bus, addr_t address, addr_t data16)
     data_t data1 = lsb8(data16);
     data_t data2 = msb8(data16);
 
-    bus[address] = &data1;
-    bus[address + 1] = &data2;
+    *bus[address] = data1;
+    *bus[address + 1] = *data2;
 
     return ERR_NONE;
 }
