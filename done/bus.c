@@ -111,7 +111,7 @@ int bus_read(const bus_t bus, addr_t address, data_t *data)
     int err = ERR_NONE;
     if ((err = check_bounds(address, 0, BUS_SIZE)) != ERR_NONE)
     {
-        return err;
+        //return err;
     }
 
     if (data == NULL)
@@ -119,19 +119,23 @@ int bus_read(const bus_t bus, addr_t address, data_t *data)
        return ERR_BAD_PARAMETER;
     }
 
-    data_t dat = 0x3;
-    data = &dat;
+    data_t dat = 0xff;
+    *data = dat;
+        //printf("&bus[0] = %zx\n", *bus[0]);
 
-       // printf("pre data = %u\n", *data);
+        //printf("pre data = %u\n", *data);
+        //printf("&bus[address] = %zx\n", &bus[address]);
+        //printf("bus[address] = %zx\n", bus[address]);
+        //printf("*bus[address] = %zx\n", *bus[address]);
 
     if (bus[address] != NULL)
     {
-        data = (data_t*)bus[address];
+       *data = *bus[address];
     }
 
-       // printf("post data = %u\n", *data);
+       //printf("post data = %u\n", *data);
 
-
+printf("--------------------------------------------------\n");
     return ERR_NONE;
 }
 
