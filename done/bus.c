@@ -108,16 +108,12 @@ int bus_unplug(bus_t bus, component_t *c)
 
 int bus_read(const bus_t bus, addr_t address, data_t *data)
 {
-    int err = ERR_NONE;
-    if ((err = check_bounds(address, 0, BUS_SIZE)) != ERR_NONE)
+    
+    if (data == NULL || address < 0 || address > BUS_SIZE)
     {
-        //return err;
+        return ERR_BAD_PARAMETER;
     }
 
-    if (data == NULL)
-    {
-       return ERR_BAD_PARAMETER;
-    }
 
     data_t dat = 0xff;
     *data = dat;
@@ -140,16 +136,11 @@ int bus_read(const bus_t bus, addr_t address, data_t *data)
 
 int bus_read16(const bus_t bus, addr_t address, addr_t *data16)
 {
-    int err = ERR_NONE;
-    if ((err = check_bounds(address, 0, BUS_SIZE)) != ERR_NONE)
-    {
-       // return err;
-    }
-
-    if (data16 == NULL)
+    if (data16 == NULL || address < 0 || address > BUS_SIZE)
     {
         return ERR_BAD_PARAMETER;
     }
+
     addr_t dat16 = 0xff;
 
     if (bus[address] != NULL)
@@ -158,7 +149,7 @@ int bus_read16(const bus_t bus, addr_t address, addr_t *data16)
         data_t *ptr2 = dat16;
 
         // Extracting LSBs from bus at addr_t adress
-        err = bus_read(bus, address, ptr1);
+        int err = bus_read(bus, address, ptr1);
         if (err != ERR_NONE)
         {
             return err;
@@ -181,13 +172,9 @@ int bus_read16(const bus_t bus, addr_t address, addr_t *data16)
 
 int bus_write(bus_t bus, addr_t address, data_t data)
 {
-    int err = ERR_NONE;
-    if ((err = check_bounds(address, 0, BUS_SIZE)) != ERR_NONE)
-    {
-        return err;
-    }
+    
 
-    if (address == 0)
+    if (address <= 0 || address > BUS_SIZE)
     {
         return ERR_BAD_PARAMETER;
     }
@@ -198,13 +185,7 @@ int bus_write(bus_t bus, addr_t address, data_t data)
 
 int bus_write16(bus_t bus, addr_t address, addr_t data16)
 {
-    int err = ERR_NONE;
-    if ((err = check_bounds(address, 0, BUS_SIZE)) != ERR_NONE)
-    {
-        return err;
-    }
-
-    if (address == 0)
+    if (address <= 0 || address > BUS_SIZE)
     {
         return ERR_BAD_PARAMETER;
     }
