@@ -135,7 +135,6 @@ int bus_read(const bus_t bus, addr_t address, data_t *data)
 
        //printf("post data = %u\n", *data);
 
-printf("--------------------------------------------------\n");
     return ERR_NONE;
 }
 
@@ -144,7 +143,7 @@ int bus_read16(const bus_t bus, addr_t address, addr_t *data16)
     int err = ERR_NONE;
     if ((err = check_bounds(address, 0, BUS_SIZE)) != ERR_NONE)
     {
-        return err;
+       // return err;
     }
 
     if (data16 == NULL)
@@ -155,8 +154,8 @@ int bus_read16(const bus_t bus, addr_t address, addr_t *data16)
 
     if (bus[address] != NULL)
     {
-        data_t *ptr1 = &dat16;
-        data_t *ptr2 = &dat16;
+        data_t *ptr1 = dat16;
+        data_t *ptr2 = dat16;
 
         // Extracting LSBs from bus at addr_t adress
         err = bus_read(bus, address, ptr1);
@@ -175,7 +174,7 @@ int bus_read16(const bus_t bus, addr_t address, addr_t *data16)
         dat16 = merge8(*ptr1, *ptr2);
     }
 
-    data16 = &dat16;
+    *data16 = dat16;
 
     return ERR_NONE;
 }
