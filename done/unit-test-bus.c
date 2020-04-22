@@ -39,19 +39,12 @@ START_TEST(bus_plug_err)
     printf("=== %s:\n", __func__);
 #endif
     INIT;
-    printf("test 1\n");
     ck_assert_int_eq(bus_plug(bus, NULL, 0, 0), ERR_BAD_PARAMETER);
     const int err = bus_plug(bus, &c, 0, 0);
-    printf("test 2\n");
     ck_assert((err == ERR_BAD_PARAMETER) || (err == ERR_ADDRESS));
-    printf("test 3\n");
     ck_assert_int_eq(component_create(&c, 2), ERR_NONE);
-    printf("test 4\n");
-    printf("test 5\n");
     ck_assert_int_eq(bus_plug(bus, &c, 0, 1), ERR_NONE);
-    printf("test 6\n");
     ck_assert_int_eq(bus_plug(bus, &c, 0, 1), ERR_ADDRESS); // since we plugged already
-    printf("test 7\n");
     ck_assert_int_eq(bus_unplug(bus, NULL), ERR_BAD_PARAMETER);
     component_free(&c);
 

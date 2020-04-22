@@ -44,7 +44,7 @@ int bus_remap(bus_t bus, component_t *c, addr_t offset)
 
     for (int i = 0; i <= end - start; ++i)//should it be addr_t i 
     {
-        bus[start + i] = (c->mem->memory[offset + i]);
+        bus[start + i] = &(c->mem->memory[offset + i]);
     }
 
     return ERR_NONE;
