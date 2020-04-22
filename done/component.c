@@ -11,16 +11,21 @@ int component_create(component_t* c, size_t mem_size)
     {
         return ERR_BAD_PARAMETER;
     }
-
-    c->start =0;
-    c->end=0;
+    component_t component = {NULL, 0, 0};
+    component.start =0;
+    component.end=0;
     if (mem_size == 0){
-        c->mem = NULL;
+        component.mem = NULL;
         return ERR_NONE;
     }
+    component.mem = calloc(mem_size, sizeof(memory_t));
 
-    mem_create(c->mem, mem_size);
-    return ERR_NONE;
+    int err = mem_create(component.mem, mem_size);
+    if (err == ERR_NONE){
+        *c = component;
+    }
+    
+    return err;
 }
 
 
