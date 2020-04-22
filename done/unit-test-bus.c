@@ -141,7 +141,7 @@ START_TEST(bus_read_exec)
 
     for (size_t addr = 0; addr < c_size; ++addr) {
         ck_assert_int_eq(bus_read(bus, (addr_t) addr, &data), ERR_NONE);
-       //fprintf(stderr, " data = %u \t|||\t (data_t)addr = %u\n", data, (data_t)addr);
+        //fprintf(stderr, " data = %u \t|||\t (data_t)addr = %u\n", data, (data_t)addr);
         ck_assert(data == (data_t)addr);
     }
 

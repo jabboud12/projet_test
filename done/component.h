@@ -27,7 +27,7 @@ typedef struct {
     memory_t *mem;
     addr_t start;
     addr_t end;
-}component_t;
+} component_t;
 
 /**
  * @brief Creates a component given various arguments
