@@ -133,27 +133,26 @@ int bus_read16(const bus_t bus, addr_t address, addr_t *data16)
     }
 
     data_t dat16 = 0xff;
-    data_t *ptr1 = NULL;
-    data_t *ptr2 = NULL;
+    
 
     *data16 = (addr_t) dat16;
     if (bus[address] != NULL) {
-        *ptr1 = dat16;
-        *ptr2 = dat16;
+        data_t ptr1 = dat16;
+        data_t ptr2 = dat16;
 
         // Extracting LSBs from bus at addr_t adress
-        int err = bus_read(bus, address, ptr1);
+        int err = bus_read(bus, address, &ptr1);
         if (err != ERR_NONE) {
             return err;
         }
 
         //Extracting MSBs from bus at addr_t address + 1
-        err = bus_read(bus, address + 1, ptr2);
+        err = bus_read(bus, address + 1, &ptr2);
         if (err != ERR_NONE) {
             return err;
         }
 
-        *data16 = (addr_t) merge8(*ptr1, *ptr2);
+        *data16 = (addr_t) merge8(ptr1, ptr2);
     }
 
 

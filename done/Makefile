@@ -12,10 +12,12 @@ CFLAGS += -std=c11 -Wall -pedantic -g
 # a bit more checks if you'd like to (uncomment
  CFLAGS += -Wextra -Wfloat-equal -Wshadow                         \
  -Wpointer-arith -Wbad-function-cast -Wcast-align -Wwrite-strings \
- -Wunreachable-code #-Wconversion 
+ -Wunreachable-code #-Wconversion \
+ -Wcast-qual -Winit-self -Wstrict-prototypes -Wmissing-declarations
+ 
 
 # uncomment if you want to add DEBUG flag
-#CPPFLAGS += -DDEBUG
+CPPFLAGS += -DDEBUG
 
 # ----------------------------------------------------------------------
 # feel free to update/modifiy this part as you wish
