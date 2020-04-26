@@ -20,12 +20,10 @@
     ck_assert_int_eq(bus_forced_plug(bus, c, 0, (addr_t)(BUS_SIZE-1),0), ERR_NONE); \
 
 #define INIT_CPU(cpu, c) \
-    do{ \
     bus_t bus = {0}; \
     ck_assert_int_eq(cpu_init(cpu), ERR_NONE); \
     ck_assert_int_eq(cpu_plug(cpu,&bus), ERR_NONE); \
-    COMPONENT_FULL_BUS(bus,c);\
-    } while(0)
+    COMPONENT_FULL_BUS(bus,c)
 
 #define INIT_RUN()\
     cpu_t cpu;\
@@ -49,7 +47,6 @@
     do{ \
         INIT_RUN();\
         LOOP_ON(input_f) {\
-            ck_assert_int_eq(cpu_init(&cpu), ERR_NONE);\
             cpu.A = input_a[i_];\
             cpu.F = input_f[i_];\
             cpu_HL_set(&cpu,0);\
@@ -67,7 +64,6 @@
     do{ \
         INIT_RUN();\
         LOOP_ON(input_f) {\
-        ck_assert_int_eq(cpu_init(&cpu), ERR_NONE);\
             cpu.A = input_a[i_];\
             cpu.F = input_f[i_];\
             cpu.PC = 0;\
@@ -86,7 +82,6 @@
     do{ \
         INIT_RUN();\
         LOOP_ON(input_f) {\
-        ck_assert_int_eq(cpu_init(&cpu), ERR_NONE);\
             cpu.A = input_a[i_];\
             cpu.F = input_f[i_];\
             cpu_reg_set(&cpu, reg_k, input_b[i_]);\
@@ -103,7 +98,6 @@
     do{ \
         INIT_RUN();\
         LOOP_ON(input_f) {\
-            ck_assert_int_eq(cpu_init(&cpu), ERR_NONE);\
             cpu.F = input_f[i_];\
             cpu_reg_set(&cpu, reg_k, input_a[i_]);\
             DO_RUN(cpu,__VA_ARGS__);\
@@ -119,7 +113,6 @@
     do{ \
         INIT_RUN();\
         LOOP_ON(input_f) {\
-            ck_assert_int_eq(cpu_init(&cpu), ERR_NONE);\
             cpu.F = input_f[i_];\
             cpu_reg_pair_SP_set(&cpu, reg_k, input_a[i_]);\
             DO_RUN(cpu,__VA_ARGS__);\

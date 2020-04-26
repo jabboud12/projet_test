@@ -13,6 +13,7 @@
 
 #include "bus.h"
 #include "component.h"
+#include "cpu.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,8 +28,12 @@ extern "C" {
 typedef struct {
     bus_t bus;
     component_t components[GB_NB_COMPONENTS];
+    cpu_t cpu;
 } gameboy_t;
 
+/**
+ * @brief Enum for the different compononents' indices in the Gameboy's components array
+ */
 typedef enum {
     WORK_RAM, REGISTERS, EXTERN_RAM, VIDEO_RAM, GRAPH_RAM, USELESS
 } gb_components;
