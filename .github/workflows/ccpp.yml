@@ -14,7 +14,7 @@ jobs:
     steps:
     - uses: actions/checkout@master
     - name: make check
-      run: cd done
+      run: cd donee
     - name: make style
       run: make style
     - name: make clean
