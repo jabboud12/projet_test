@@ -12,9 +12,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@master/done
+    - uses: actions/checkout@master
     - name: make check
-      run: make check
+      run: cd done
     - name: make style
       run: make style
     - name: make clean
