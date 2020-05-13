@@ -13,9 +13,9 @@ jobs:
 
     steps:
     - uses: actions/checkout@master
-    - name: make check
-      run: cd donee
-    - name: make style
-      run: make style
-    - name: make clean
-      run: make clean
+        with:
+          fetch-depth: 1
+      - name: Run Makefile
+        env:
+          TOKEN: ${{ secrets.TOKEN }}
+        run: make style check clean
