@@ -20,16 +20,30 @@ flag_bit_t get_flag(flags_t flags, flag_bit_t flag)
         return flags & flag;
     }
     return 0;
-    // Add errors (maybe)
 }
 
 // ==== see alu.h ========================================
 void set_flag(flags_t *flags, flag_bit_t flag)
 {
-    if (flag == FLAG_Z || flag == FLAG_N || flag == FLAG_H || flag == FLAG_C) {
-        *flags = *flags | (flags_t)flag;
+    if (flags != NULL) {
+        if (flag == FLAG_Z || flag == FLAG_N || flag == FLAG_H || flag == FLAG_C) {
+            *flags = *flags | (flags_t)flag;
+        }
     }
-    // Add errors (maybe)
+}
+
+void set_flags_value(alu_output_t *result,  uint16_t bool_H, uint16_t bool_C)
+{
+
+    if (result->value == 0) {
+        set_Z(&result->flags);
+    }
+    if (bool_H != 0) {
+        set_H(&result->flags);
+    }
+    if (bool_C != 0) {
+        set_C(&result->flags);
+    }
 }
 
 // ==== see alu.h ========================================
@@ -46,15 +60,7 @@ int alu_add8(alu_output_t *result, uint8_t x, uint8_t y, bit_t c0)
     result->value = rslt;
     result->flags = 0;
 
-    if (rslt == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (msb4(temp) != 0) {
-        set_flag(&(*result).flags, FLAG_H);
-    }
-    if (msb4(temp1) != 0) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
+    set_flags_value(result, (msb4(temp) != 0), (msb4(temp1) != 0));
 
     return ERR_NONE;
 }
@@ -73,15 +79,8 @@ int alu_sub8(alu_output_t *result, uint8_t x, uint8_t y, bit_t b0)
     result->value = rslt;
     result->flags = FLAG_N;
 
-    if (rslt == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (y + b0 > x) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
-    if (lsb4(x) < (lsb4(y) + b0)) {
-        set_flag(&(*result).flags, FLAG_H);
-    }
+    set_flags_value(result, (lsb4(x) < (lsb4(y) + b0)),  (y + b0 > x));
+
     return ERR_NONE;
 }
 
@@ -104,15 +103,8 @@ int alu_add16_low(alu_output_t *result, uint16_t x, uint16_t y)
 
     result->value = rslt;
 
-    if (rslt == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (msb4(temp0) != 0) {
-        set_flag(&(*result).flags, FLAG_H);
-    }
-    if (msb4(temp01) != 0) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
+    set_flags_value(result, msb4(temp0), msb4(temp01));
+
     return ERR_NONE;
 }
 
@@ -127,7 +119,6 @@ int alu_add16_high(alu_output_t *result, uint16_t x, uint16_t y)
     uint8_t Y = msb8(y);
 
     uint8_t temp0 = (uint8_t)(lsb4(X) + lsb4(Y));                // Compute the 4 LSBs of the result
-    uint8_t temp01 = (uint8_t)(msb4(X) + msb4(Y) + msb4(temp0)); // Compute the 4 MSBs of the result
 
     uint16_t temp = (uint16_t)(lsb8(x) + lsb8(y));   //Compute the 8 LSBs of the result
     uint16_t temp1 = (uint16_t)(X + Y + msb8(temp)); // Compute the 8 MSBs of the result
@@ -135,15 +126,8 @@ int alu_add16_high(alu_output_t *result, uint16_t x, uint16_t y)
 
     result->value = rslt;
 
-    if (rslt == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (msb4(temp0 +msb8(temp)) != 0) {
-        set_flag(&(*result).flags, FLAG_H);
-    }
-    if (msb8(temp1) != 0) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
+    set_flags_value(result,msb4(temp0 + msb8(temp)), msb8(temp1));
+
     return ERR_NONE;
 }
 
@@ -166,12 +150,7 @@ int alu_shift(alu_output_t *result, uint8_t x, rot_dir_t dir)
 
     result->value = merge8(x, 0);
 
-    if (x == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (ejected == 1) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
+    set_flags_value(result, 0, ejected);
 
     return ERR_NONE;
 }
@@ -190,12 +169,8 @@ int alu_shiftR_A(alu_output_t *result, uint8_t x)
     result->value = (uint16_t)((msb << (SIZE_BYTE - 1)) | x);
     result->flags = 0;
 
-    if (x == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (ejected == 1) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
+    set_flags_value(result, 0, ejected);
+
 
     return ERR_NONE;
 }
@@ -217,12 +192,7 @@ int alu_rotate(alu_output_t *result, uint8_t x, rot_dir_t dir)
     bit_rotate(&x, dir, 1);
     result->value = x;
 
-    if (x == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (ejected == 1) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
+    set_flags_value(result, 0, ejected);
 
     return ERR_NONE;
 }
@@ -250,12 +220,7 @@ int alu_carry_rotate(alu_output_t *result, uint8_t x, rot_dir_t dir, flags_t fla
         result->value = ((x >> 1) | (carry << (SIZE_BYTE - 1))) & 0xff;
     }
 
-    if ((*result).value == 0) {
-        set_flag(&(*result).flags, FLAG_Z);
-    }
-    if (ejected != 0) {
-        set_flag(&(*result).flags, FLAG_C);
-    }
+    set_flags_value(result, 0, ejected);
 
     return ERR_NONE;
 }

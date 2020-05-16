@@ -21,12 +21,11 @@ int mem_create(memory_t *mem, size_t size)
 
     // Initialize a memory_t instance and allocate necessary
     // space for it in the computer memory
-    memory_t m = {0, 0, NULL};
+    memory_t m = {0, NULL};
     m.memory = calloc(size, sizeof(data_t));
 
     if (m.memory != NULL) {
         m.size = size;
-        m.allocated = size; //fixme
     } else {
         return ERR_MEM;
     }
@@ -46,6 +45,5 @@ void mem_free(memory_t *mem)
         free(mem->memory);
         mem->memory = NULL;
         mem->size = 0;
-        mem->allocated = 0;
     }
 }
