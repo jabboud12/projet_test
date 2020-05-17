@@ -23,7 +23,7 @@ int cartridge_init_from_file(component_t* c, const char* filename)
             fclose(input);
             return ERR_IO;
         }
-        
+
         // for (int i = 0; i < BANK_ROM_SIZE; ++i){
         //     c->mem->memory[i] = bootrom_memory[i];
 

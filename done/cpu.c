@@ -173,13 +173,12 @@ int cpu_dispatch(const instruction_t *lu, cpu_t *cpu)
             break;
         case EDI:
             cpu->IME = extract_ime(lu->opcode);
-            
             cpu->PC += lu->bytes;
             break;
         case RETI:
             cpu->IME = 1;
             cpu->PC = cpu_SP_pop(cpu);
-            printf("in reti\n");
+            // printf("in reti\n");
             break;
         case HALT:
             cpu->HALT = 1;
@@ -294,14 +293,13 @@ void cpu_request_interrupt(cpu_t* cpu, interrupt_t i)
     if (bit_get(cpu_read_at_idx(cpu, REG_IE), i) == 1) { //cpu->IME ==1 &&
         data_t data = cpu_read_at_idx(cpu, REG_IF);
         bit_set(&data, i);
-        printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
+        // printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
         cpu_write_at_idx(cpu,REG_IF, data);
         cpu->IF = cpu_read_at_idx(cpu, REG_IF);
-        printf("cpu->IE = %d  cpu_read_at_idx(cpu, REG_IE) = %d\n", cpu->IE, cpu_read_at_idx(cpu, REG_IE) );
-        printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
-
+        // printf("cpu->IE = %d  cpu_read_at_idx(cpu, REG_IE) = %d\n", cpu->IE, cpu_read_at_idx(cpu, REG_IE) );
+        // printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
     }
-            printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
+    // printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
 
 }
 
