@@ -18,7 +18,6 @@ extern "C" {
 #include "bus.h"
 #include "error.h"
 #include "opcode.h"
-#include "component.h"
 
 
 //=========================================================================
@@ -82,7 +81,6 @@ typedef struct {
     component_t high_ram;
     addr_t write_listener;
     uint8_t idle_time;
-
 } cpu_t;
 
 

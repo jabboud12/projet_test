@@ -31,18 +31,21 @@ int bootrom_bus_listener(gameboy_t* gameboy, addr_t addr)
     if (gameboy == NULL) {
         return ERR_BAD_PARAMETER;
     }
-    addr_t trigger = cpu_read16_at_idx(&gameboy->cpu, addr);
-    if (trigger != NULL && gameboy->boot == 1) {
+    if(addr == REG_BOOT_ROM_DISABLE) {
+        //fixme
+        // addr_t trigger = cpu_read16_at_idx(&gameboy->cpu, addr);
+        // if (trigger != NULL && gameboy->boot == 1) {
         // Deactivates the bootrom
-        int err = bus_unplug(gameboy->bus, gameboy->bootrom);
+        int err = bus_unplug(gameboy->bus, &gameboy->bootrom);
         if (err != ERR_NONE) {
             return err;
         }
         // Maps the component to the corresponding part of the bus
-        cartridge_plug();
+        //cartridge_plug(&gameboy->cartridge, gameboy->bus);
         // Set boot bit to 0 to mark end of boot
         gameboy->boot = 0;
 
+        // }
     }
     return ERR_NONE;
 }

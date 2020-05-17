@@ -21,7 +21,7 @@ int mem_create(memory_t *mem, size_t size)
 
     // Initialize a memory_t instance and allocate necessary
     // space for it in the computer memory
-    memory_t m = {0, NULL};
+    memory_t m = {0, 0, NULL};
     m.memory = calloc(size, sizeof(data_t));
 
     if (m.memory != NULL) {

@@ -22,11 +22,8 @@
 #include "memory.h"
 #include "component.h"
 #include "error.h"
-#include "cpu-storage.h"
-#include "cartridge.h"
-#include "bootrom.h"
 #include "gameboy.h"
-
+#include "cpu-storage.h"
 
 #define INIT \
     gameboy_t g;    \

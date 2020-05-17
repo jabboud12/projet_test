@@ -16,7 +16,10 @@ int timer_init(gbtimer_t* timer, cpu_t* cpu)
     if (err != ERR_NONE) {
         return err;
     }
-    *(timer->cpu) = *cpu;
+
+    // *(timer->cpu) = *cpu;
+    timer->cpu = cpu;
+
     timer->counter = (uint16_t) 0;
     return ERR_NONE;
 }
@@ -28,9 +31,9 @@ bit_t timer_state(gbtimer_t* timer)
     }
     // TAC[2] & [TAC[1 downto 0]]
     // timer->cpu->bus[]
-    data_t tac = cpu_read_at_id(timer->cpu, REG_TAC);
+    data_t tac = cpu_read_at_idx(timer->cpu, REG_TAC);
     bit_t x = bit_get((uint8_t) tac, 2);
-    data_t div = cpu_read_at_id(timer->cpu, REG_DIV);
+    data_t div = cpu_read_at_idx(timer->cpu, REG_DIV);
     bit_t y = 0;
 
     //fixme bigtime
@@ -66,15 +69,24 @@ int timer_incr_if_state_change(gbtimer_t* timer, bit_t old_state)
         return timer;
     }
 
-    data_t tima = cpu_read_at_id(timer->cpu, REG_TIMA);
-    if (old_state && !timer_state(timer)) { // &?
-        ++tima;
+    data_t tima = cpu_read_at_idx(timer->cpu, REG_TIMA);
+
+    if (old_state && !timer_state(timer)) {
+        if (tima == 0xFF) {
+            //raise timer interrupt
+            bit_set(&timer->cpu->IE, TIMER);
+            bit_set(&timer->cpu->IF, TIMER);
+            // cpu_request_interrupt(&timer->cpu, TIMER);
+            // cpu_request_interrupt(&timer->cpu, TIMER);
+
+            //reload value
+            tima = cpu_read_at_idx(timer->cpu, REG_TMA);
+        } else {
+            ++tima;
+        }
+
     }
-    if (tima > 0xFF) {
-        //todo raise timer interrupt
-        //???
-        tima = cpu_read_at_idx(timer->cpu, REG_TMA);
-    }
+
     int err = cpu_write_at_idx(timer->cpu, REG_TIMA, tima);
     return err;
 
@@ -89,21 +101,21 @@ int timer_cycle(gbtimer_t* timer)
     // Get current state of principal timer
     bit_t current_state = timer_state(timer);
 
-    int err = timer_incr_if_state_change(timer, current_state);//twice??
-    if (err != ERR_NONE) {
-        return err;
-    }
+    //int err = timer_incr_if_state_change(timer, current_state);//twice??
+    //if (err != ERR_NONE) {
+    //    return err;
+    //}
 
     // Increment counter by 4 (A cycle is 4 clock ticks)
     timer->counter += 4;
 
     // copy 8 MSB from timer principal counter to DIV register
-    err = cpu_write_at_idx(timer->cpu, REG_DIV, msb8(timer->counter));
+    int err = cpu_write_at_idx(timer->cpu, REG_DIV, msb8(timer->counter));
     if (err != ERR_NONE) {
         return err;
     }
 
-    current_state = timer_state(timer);
+    //bit_t current_state = timer_state(timer);
     return timer_incr_if_state_change(timer, current_state); // twice??
 }
 
@@ -117,7 +129,7 @@ int timer_bus_listener(gbtimer_t* timer, addr_t addr)
 
     switch(addr) {
     case REG_DIV:
-        timer_incr_if_state_change(timer, current_state);
+        //timer_incr_if_state_change(timer, current_state);
         timer->counter = 0; // fixme or at bus
         current_state = timer_state(timer);
         timer_incr_if_state_change(timer, current_state);
@@ -126,7 +138,9 @@ int timer_bus_listener(gbtimer_t* timer, addr_t addr)
         timer_incr_if_state_change(timer, current_state);
         break;
     default :
-        return ERR_BAD_PARAMETER;
+        //return ERR_BAD_PARAMETER;
         break;
     }
+
+    return ERR_NONE;
 }

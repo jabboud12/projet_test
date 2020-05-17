@@ -12,9 +12,9 @@
 extern "C" {
 #endif
 
-#include "gameboy.h"
 #include "bus.h"
 #include "component.h"
+#include "gameboy.h"
 
 /**
  * @brief Game Boy Boot ROM content.

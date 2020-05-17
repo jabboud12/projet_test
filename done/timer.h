@@ -34,7 +34,7 @@ extern "C" {
  * @brief Timer type
  */
 typedef struct {
-    cpu_t * cpu;
+    cpu_t* cpu;
     uint16_t counter;
 } gbtimer_t;
 

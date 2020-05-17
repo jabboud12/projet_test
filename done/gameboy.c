@@ -14,7 +14,6 @@
 #include "gameboy.h"
 #include "cpu.h"
 #include "bootrom.h"
-#include "cartridge.h"
 #include "timer.h"
 
 // ==== see gameboy.h ========================================
@@ -35,8 +34,8 @@ int gameboy_create(gameboy_t *gameboy, const char *filename)
     component_t workRAM;
     memset(&workRAM, 0, sizeof(component_t));
 
-    component_t echoRAM;
-    memset(&echoRAM, 0, sizeof(component_t));
+
+    // memset(&gb.echoram, 0, sizeof(component_t));
 
     component_t registers;
     memset(&registers, 0, sizeof(component_t));
@@ -53,16 +52,8 @@ int gameboy_create(gameboy_t *gameboy, const char *filename)
     component_t useless;
     memset(&useless, 0, sizeof(component_t));
 
-    component_t bootROM;
-    memset(&bootROM, 0, sizeof(component_t));
-
-    timer_t timer;
-    memset(&bootROM, 0, sizeof(timer_t));
-
-
-
-    cartridge_t cartridge;
-    memset(&cartridge, 0, sizeof(cartridge_t));
+    // component_t bootROM;
+    // memset(&bootROM, 0, sizeof(component_t));
 
     // Instanciate the Gameboy's bus
     bus_t bus;
@@ -81,9 +72,9 @@ int gameboy_create(gameboy_t *gameboy, const char *filename)
     if (err != ERR_NONE) {
         return err;
     }
-    ++gameboy->size_components;
+    ++gb.size_components;
 
-    // err = component_create(&echoRAM, MEM_SIZE(ECHO_RAM));
+    // err = component_create(&gb.echoram, MEM_SIZE(ECHO_RAM));
     // if (err != ERR_NONE) {
     //     return err;
     // }
@@ -91,43 +82,43 @@ int gameboy_create(gameboy_t *gameboy, const char *filename)
     if (err != ERR_NONE) {
         return err;
     }
-    ++gameboy->size_components;
+    ++gb.size_components;
 
     err = component_create(&externRAM, MEM_SIZE(EXTERN_RAM));
     if (err != ERR_NONE) {
         return err;
     }
-    ++gameboy->size_components;
+    ++gb.size_components;
 
     err = component_create(&videoRAM, MEM_SIZE(VIDEO_RAM));
     if (err != ERR_NONE) {
         return err;
     }
-    ++gameboy->size_components;
+    ++gb.size_components;
 
     err = component_create(&graphRAM, MEM_SIZE(GRAPH_RAM));
     if (err != ERR_NONE) {
         return err;
     }
-    ++gameboy->size_components;
+    ++gb.size_components;
 
     err = component_create(&useless, MEM_SIZE(USELESS));
     if (err != ERR_NONE) {
         return err;
     }
-    ++gameboy->size_components;
+    ++gb.size_components;
 
-    err = component_create(&bootROM, MEM_SIZE(BOOT_ROM));
+    err = component_create(&gb.bootrom, MEM_SIZE(BOOT_ROM));
     if (err != ERR_NONE) {
         return err;
     }
 
-    err = timer_init(&timer, &gameboy->cpu);
+    err = timer_init(&gb.timer, &gb.cpu);
     if (err != ERR_NONE) {
         return err;
     }
 
-    err = cartridge_init(&cartridge, filename);
+    err = cartridge_init(&gb.cartridge, filename);
     if (err != ERR_NONE) {
         return err;
     }
@@ -139,11 +130,11 @@ int gameboy_create(gameboy_t *gameboy, const char *filename)
     if (err != ERR_NONE) {
         return err;
     }
-    component_shared(&echoRAM, &workRAM); // echoRam and workRam point to the same memory space
-    err = bus_plug(bus, &echoRAM, ECHO_RAM_START, ECHO_RAM_END);
-    if (err != ERR_NONE) {
-        return err;
-    }
+    component_shared(&gb.echoram, &workRAM); // echoRam and workRam point to the same memory space
+    // err = bus_plug(bus, &gb.echoram, ECHO_RAM_START, ECHO_RAM_END);
+    // if (err != ERR_NONE) {
+    //     return err;
+    // }
     err = bus_plug(bus, &registers, REGISTERS_START, REGISTERS_END);
     if (err != ERR_NONE) {
         return err;
@@ -160,21 +151,22 @@ int gameboy_create(gameboy_t *gameboy, const char *filename)
     if (err != ERR_NONE) {
         return err;
     }
-    err = bus_plug(bus, &useless, GRAPH_RAM_START, GRAPH_RAM_END);
+    err = bus_plug(bus, &useless, USELESS_START, USELESS_END);
     if (err != ERR_NONE) {
         return err;
     }
-    err = bootrom_plug(&bootROM, bus);
+
+    err = cartridge_plug(&gb.cartridge, &bus);
+    if (err != ERR_NONE) {
+        return err;
+    }
+
+    err = bootrom_plug(&gb.bootrom, bus);
     if (err != ERR_NONE) {
         return err;
     }
 
     err = cpu_plug(&cpu, &bus);
-    if (err != ERR_NONE) {
-        return err;
-    }
-
-    err = cartridge_plug(&cartridge, &bus);
     if (err != ERR_NONE) {
         return err;
     }
@@ -190,13 +182,10 @@ int gameboy_create(gameboy_t *gameboy, const char *filename)
     gb.components[GRAPH_RAM] = graphRAM;
     gb.components[USELESS] = useless;
     gb.cpu = cpu;
-    // WORK_RAM, REGISTERS, EXTERN_RAM, VIDEO_RAM, GRAPH_RAM, USELESS
 
-    gb.boot = 1;
-    err = timer_init(&gb.timer, &gb.cpu);
-    if (err != ERR_NONE) {
-        return err;
-    }
+    gb.boot = (bit_t) 1;
+
+
     *gameboy = gb;
     return ERR_NONE;
 }
@@ -211,13 +200,33 @@ void gameboy_free(gameboy_t *gameboy)
             component_free(&gameboy->components[i]);
             //&gameboy->components[i]= NULL;
         }
+        // bus_unplug(gameboy->bus, &gameboy->echoram);
         bus_unplug(gameboy->bus, &gameboy->bootrom);
         //free timer??
         bus_unplug(gameboy->bus, &gameboy->cartridge);
-        gameboy->size_components = 0;
+        component_free(&gameboy->echoram);
+        component_free(&gameboy->cartridge.c);
+        component_free(&gameboy->bootrom);
+
+
         gameboy->cycles = 0;
+        gameboy->size_components = 0;
     }
 }
+
+#ifdef BLARGG
+static int blargg_bus_listener(gameboy_t* gameboy, addr_t addr)
+{
+    if (gameboy == NULL) {
+        return ERR_BAD_PARAMETER;
+    }
+    if (addr == BLARGG_REG) {
+        data_t data = cpu_read_at_idx(&gameboy->cpu, addr);
+        printf("%c", data);
+    }
+    return ERR_NONE;
+}
+#endif
 
 int gameboy_run_until(gameboy_t* gameboy, uint64_t cycle)
 {
@@ -227,26 +236,43 @@ int gameboy_run_until(gameboy_t* gameboy, uint64_t cycle)
 
     int err = ERR_NONE;
     while (gameboy->cycles < cycle) {
+#ifdef BLARGG
+        if (gameboy->cycles % VBLANK_PERIOD == 0) {
+            // bit_set(&gameboy->cpu.IE, VBLANK);
+            // bit_set(&gameboy->cpu.IF, VBLANK);
+            // bit_set(&gameboy->cpu.IME, VBLANK);
+            cpu_request_interrupt(&gameboy->cpu, VBLANK);
+        }
+#endif
+
         err = timer_cycle(&gameboy->timer);
         if (err != ERR_NONE) {
             return err;
         }
+
+
         err = cpu_cycle(&gameboy->cpu);
         if (err != ERR_NONE) {
             return err;
         }
         ++gameboy->cycles;
-        /*fixme add addr*/        
-        //reg_div or reg_tac
+
         err = timer_bus_listener(&gameboy->timer, gameboy->cpu.write_listener);
         if (err != ERR_NONE) {
             return err;
         }
-        err = bootrom_bus_listener(gameboy, REG_BOOT_ROM_DISABLE);
+
+        err = bootrom_bus_listener(gameboy, gameboy->cpu.write_listener);
         if (err != ERR_NONE) {
             return err;
         }
+#ifdef BLARGG
+        M_EXIT_IF_ERR(blargg_bus_listener(gameboy, gameboy->cpu.write_listener));
+#endif
+
+
     }
 
     return err;
 }
+

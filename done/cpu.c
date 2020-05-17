@@ -26,8 +26,6 @@ int cpu_init(cpu_t *cpu)
 
     // Set all of the cpu's elements to 0
     memset(cpu, 0, sizeof(cpu_t));
-    cpu->idle_time = (uint8_t) 0; // Unnecessary?
-    cpu->write_listener = (addr_t) 0;
 
     int err = component_create(&cpu->high_ram, HIGH_RAM_SIZE);
     return err;
@@ -116,10 +114,9 @@ int cpu_dispatch(const instruction_t *lu, cpu_t *cpu)
     int err = ERR_NONE;
     if (lu->family >= LD_A_BCR && lu->family <= LD_SP_HL) {
         err = cpu_dispatch_storage(lu, cpu);
-    } else if(lu->family >= ADD_A_HLR && lu->family <= CHG_U3_R8) {
+    } else if(lu->family >= ADD_A_HLR && lu->family <= SCCF) {
         err = cpu_dispatch_alu(lu, cpu);
-
-    } else {
+    } else  {
         switch (lu->family) {
         case JP_N16:
             cpu->PC = cpu_read_addr_after_opcode(cpu);
@@ -176,13 +173,17 @@ int cpu_dispatch(const instruction_t *lu, cpu_t *cpu)
             break;
         case EDI:
             cpu->IME = extract_ime(lu->opcode);
+            
+            cpu->PC += lu->bytes;
             break;
         case RETI:
             cpu->IME = 1;
             cpu->PC = cpu_SP_pop(cpu);
+            printf("in reti\n");
             break;
         case HALT:
             cpu->HALT = 1;
+            cpu->PC += lu->bytes;
             break;
         case STOP:
             //acts like a NOP
@@ -271,6 +272,7 @@ int cpu_cycle(cpu_t *cpu)
     }
     cpu->write_listener = (addr_t) 0;
 
+
     interrupt_t i = first_interrupt(cpu->IE, ~cpu->IF);
     // if (cpu->HALT == 1 && i <= JOYPAD) {
     //     cpu->HALT = 0;
@@ -285,8 +287,21 @@ int cpu_cycle(cpu_t *cpu)
 
 void cpu_request_interrupt(cpu_t* cpu, interrupt_t i)
 {
-    if (bit_get(cpu->IE, i) == 1) { //cpu->IME ==1 &&
-        bit_set(&cpu->IF, i);
+    // if (cpu->IME ==1 && bit_get(cpu->IE, i) == 1) { //
+    //     bit_set(&cpu->IF, i);
+    // }
+    cpu->IE = cpu_read_at_idx(cpu, REG_IE);
+    if (bit_get(cpu_read_at_idx(cpu, REG_IE), i) == 1) { //cpu->IME ==1 &&
+        data_t data = cpu_read_at_idx(cpu, REG_IF);
+        bit_set(&data, i);
+        printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
+        cpu_write_at_idx(cpu,REG_IF, data);
+        cpu->IF = cpu_read_at_idx(cpu, REG_IF);
+        printf("cpu->IE = %d  cpu_read_at_idx(cpu, REG_IE) = %d\n", cpu->IE, cpu_read_at_idx(cpu, REG_IE) );
+        printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
+
     }
+            printf("cpu->IF = %d  cpu_read_at_idx(cpu, REG_IF) = %d\n", cpu->IF, cpu_read_at_idx(cpu, REG_IF) );
+
 }
 
